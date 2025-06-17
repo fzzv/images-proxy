@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { handle } from 'hono/vercel'
 import type { Context } from 'hono'
-import { getWallpaperList, getAvailableSources } from '../../lib/wallpaper-utils'
+import { getWallpaperList, getAvailableSources, getBingWallpaperList } from '../../lib/wallpaper-utils'
 
 export const config = {
   runtime: 'edge'
@@ -45,6 +45,29 @@ app.get('/getWallpaperList', async (c: Context) => {
   }
 })
 
+/**
+ * 获取每日bing的壁纸
+ * path: /v1/getBingWallpaperList
+ * 
+ * response:
+ * - code: number
+ * - data:
+ *   - list: Bing壁纸数组
+ *   - total: number
+ *   - date: string
+ * - message: string
+ */
+app.get('/getBingWallpaperList', async (c: Context) => {
+  const data = await getBingWallpaperList()
+  
+  // 根据返回的code设置正确的HTTP状态码
+  if (data.code === 200) {
+    return c.json(data)
+  } else {
+    return c.json(data, 500)
+  }
+})
+
 // 获取可用的来源列表
 app.get('/getSources', async (c: Context) => {
   try {
@@ -72,6 +95,7 @@ app.get('/health', (c: Context) => {
       status: 'healthy',
       endpoints: [
         'GET /api/v1/getWallpaperList?page=1&source=Unsplash',
+        'GET /api/v1/getBingWallpaperList',
         'GET /api/v1/getSources',
         'GET /api/v1/health'
       ],

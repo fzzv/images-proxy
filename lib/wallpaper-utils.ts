@@ -12,6 +12,25 @@ export interface WallpaperItem {
   source: string
 }
 
+// Bing壁纸数据接口定义
+export interface BingWallpaperItem {
+  startdate: string
+  fullstartdate: string
+  enddate: string
+  url: string
+  urlbase: string
+  copyright: string
+  copyrightlink: string
+  title: string
+  quiz: string
+  wp: boolean
+  hsh: string
+  drk: number
+  top: number
+  bot: number
+  hs: any[]
+}
+
 // API响应接口定义
 export interface WallpaperListResponse {
   code: number
@@ -24,10 +43,27 @@ export interface WallpaperListResponse {
   message: string
 }
 
+// Bing壁纸响应接口定义
+export interface BingWallpaperResponse {
+  code: number
+  data: {
+    url: string
+    list: BingWallpaperItem[]
+    total: number
+    date: string
+  }
+  message: string
+}
+
 // 缓存数据以避免重复读取文件
 let cachedData: WallpaperItem[] | null = null
 let lastCacheTime: number = 0
 const CACHE_DURATION = 5 * 60 * 1000 // 5分钟缓存
+
+// Bing壁纸缓存
+let cachedBingData: BingWallpaperItem[] | null = null
+let lastBingCacheTime: number = 0
+const BING_CACHE_DURATION = 60 * 60 * 1000 // 1小时缓存（Bing数据更新较慢）
 
 /**
  * 从JSON文件加载壁纸数据
@@ -56,6 +92,38 @@ async function loadWallpaperData(): Promise<WallpaperItem[]> {
   } catch (error) {
     console.error('Error loading wallpaper data:', error)
     throw new Error('Failed to load wallpaper data')
+  }
+}
+
+/**
+ * 获取Bing每日壁纸数据
+ */
+async function loadBingWallpaperData(): Promise<BingWallpaperItem[]> {
+  const now = Date.now()
+  
+  // 如果缓存有效，直接返回缓存数据
+  if (cachedBingData && (now - lastBingCacheTime) < BING_CACHE_DURATION) {
+    return cachedBingData
+  }
+  
+  try {
+    // 获取Bing壁纸API数据
+    const response = await fetch('https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&mkt=en-US')
+    if (!response.ok) {
+      throw new Error(`Failed to fetch Bing data: ${response.status}`)
+    }
+    
+    const data = await response.json()
+    const images = data.images || []
+    
+    // 更新缓存
+    cachedBingData = images
+    lastBingCacheTime = now
+    
+    return images
+  } catch (error) {
+    console.error('Error loading Bing wallpaper data:', error)
+    throw new Error('Failed to load Bing wallpaper data')
   }
 }
 
@@ -126,6 +194,39 @@ export async function getWallpaperList(
         total: 0,
         page: 1,
         totalPage: 0
+      },
+      message: 'Internal server error'
+    }
+  }
+}
+
+/**
+ * 获取Bing每日壁纸列表
+ */
+export async function getBingWallpaperList(): Promise<BingWallpaperResponse> {
+  try {
+    const bingData = await loadBingWallpaperData()
+    
+    return {
+      code: 200,
+      data: {
+        url: `https://www.bing.com${bingData[0].url}`,
+        list: bingData,
+        total: bingData.length,
+        date: new Date().toISOString()
+      },
+      message: 'Success'
+    }
+    
+  } catch (error) {
+    console.error('Error in getBingWallpaperList:', error)
+    return {
+      code: 500,
+      data: {
+        url: '',
+        list: [],
+        total: 0,
+        date: new Date().toISOString()
       },
       message: 'Internal server error'
     }
