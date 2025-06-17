@@ -1,6 +1,3 @@
-import fs from 'fs'
-import path from 'path'
-
 // 壁纸数据接口定义
 export interface WallpaperItem {
   src: {
@@ -44,9 +41,12 @@ async function loadWallpaperData(): Promise<WallpaperItem[]> {
   }
   
   try {
-    const filePath = path.join(process.cwd(), 'db', 'all.json')
-    const fileContent = await fs.promises.readFile(filePath, 'utf-8')
-    const data = JSON.parse(fileContent) as WallpaperItem[]
+    const response = await fetch('https://wallpaper.xyu.fan/all.json')
+    if (!response.ok) {
+      throw new Error(`Failed to fetch data: ${response.status}`)
+    }
+    
+    const data = await response.json() as WallpaperItem[]
     
     // 更新缓存
     cachedData = data

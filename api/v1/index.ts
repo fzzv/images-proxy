@@ -3,7 +3,9 @@ import { handle } from 'hono/vercel'
 import type { Context } from 'hono'
 import { getWallpaperList, getAvailableSources } from '../../lib/wallpaper-utils'
 
-
+export const config = {
+  runtime: 'edge'
+}
 
 const app = new Hono().basePath('/api/v1')
 
