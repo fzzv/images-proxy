@@ -1,0 +1,24 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/v1/(.*)",
+      "destination": "/api/v1"
+    },
+    {
+      "source": "/api/wallpaper/(.*)",
+      "destination": "/api/wallpaper/[...path]"
+    },
+    {
+      "source": "/api/findaphoto/(.*)",
+      "destination": "/api/findaphoto/[...path]"
+    },
+    {
+      "source": "/api/bing/(.*)",
+      "destination": "/api/bing/[...path]"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    }
+  ]
+}
