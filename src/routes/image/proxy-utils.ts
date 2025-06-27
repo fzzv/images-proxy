@@ -7,9 +7,9 @@ export interface ProxyConfig {
 }
 
 export const DEFAULT_PROXY_CONFIG: ProxyConfig = {
-  baseUrl: 'http://localhost:3000',
+  baseUrl: 'http://wallpaper.xyu.fan',
   originalDomain: 'infinitypro-img.infinitynewtab.com',
-  proxyPath: '/api/wallpaper'
+  proxyPath: '/image/wallpaper'
 };
 
 // 将原始图片URL转换为代理URL

@@ -77,7 +77,7 @@ async function loadWallpaperData(): Promise<WallpaperItem[]> {
   }
   
   try {
-    const response = await fetch('http://wallpaper.xyu.fan/all.json')
+    const response = await fetch('http://wallpaper.xyu.fan/static/all.json')
     if (!response.ok) {
       throw new Error(`Failed to fetch data: ${response.status}`)
     }
