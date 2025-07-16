@@ -6,7 +6,7 @@ import {
   updateProxyStats,
   getProxyStats
 } from './proxy-utils.js'
-import { getThumbnailQuery } from '../../../utils/index.js'
+import { getThumbnailQuery } from '../../utils/index.js'
 
 const app = new Hono()
 
