@@ -6,6 +6,7 @@ import {
   updateProxyStats,
   getProxyStats
 } from './proxy-utils.js'
+import { getThumbnailQuery } from '../../../utils/index.js'
 
 const app = new Hono()
 
@@ -53,8 +54,8 @@ app.get('/*', async (c: Context) => {
       return c.json({ error: 'Path is required' }, 400)
     }
 
-    const key = 'imageView2/2/w/203/format/webp/interlace/1'
-    const query = Object.keys(c.req.query()).includes(key) ? key : ''
+    const { isThumbnail, width } = c.req.query()
+    const query = isThumbnail && width ? getThumbnailQuery(width) : ''
 
     // 构建原始URL
     const originalUrl: string = `https://infinitypro-img.infinitynewtab.com/wallpaper/${path}?${query}`

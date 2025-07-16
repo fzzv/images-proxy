@@ -5,6 +5,7 @@ import {
   generateImageMetadata,
   updateProxyStats,
 } from './proxy-utils.js'
+import { getThumbnailQuery } from '../../../utils/index.js'
 
 const app = new Hono()
 
@@ -24,6 +25,7 @@ app.get('/*', async (c: Context) => {
   const startTime = Date.now()
 
   try {
+    const { isThumbnail, width } = c.req.query()
     // 获取路径参数
     let path: string = c.req.param('*') || c.req.path.replace('/image/bing/', '')
 
@@ -37,8 +39,7 @@ app.get('/*', async (c: Context) => {
       return c.json({ error: 'Path is required' }, 400)
     }
 
-    const key = 'imageView2/2/w/203/format/webp/interlace/1'
-    const query = Object.keys(c.req.query()).includes(key) ? key : ''
+    const query = isThumbnail && width ? getThumbnailQuery(width) : ''
 
     // 构建原始URL
     const originalUrl: string = `https://infinitypro-img.infinitynewtab.com/bing/${path}?${query}`

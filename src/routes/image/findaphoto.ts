@@ -6,6 +6,7 @@ import {
   updateProxyStats,
   getProxyStats
 } from './proxy-utils.js'
+import { getThumbnailQuery } from '../../../utils/index.js'
 
 
 const app = new Hono()
@@ -44,8 +45,8 @@ app.get('/*', async (c: Context) => {
     // 获取路径参数
     let path: string = c.req.param('*') || c.req.path.replace('/image/findaphoto/', '')
 
-    const key = 'imageView2/2/w/203/format/webp/interlace/1'
-    const query = Object.keys(c.req.query()).includes(key) ? key : ''
+    const { isThumbnail, width } = c.req.query()
+    const query = isThumbnail && width ? getThumbnailQuery(width) : ''
     // 处理路径开头的斜杠
     if (path.startsWith('/')) {
       path = path.substring(1)
