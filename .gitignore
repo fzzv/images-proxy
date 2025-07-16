@@ -31,3 +31,5 @@ lerna-debug.log*
 .vercel
 
 dist/
+
+downloaded_images/
